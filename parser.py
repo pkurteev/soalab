@@ -23,7 +23,7 @@ if type == "Json":
     data['SortedInputs'] = sorted_vals
     json_data = json.dumps(data)
     print(type)
-    print(json_data.replace(" ",""))
+    print(json_data)
 else:
     #i = "<Input><K>10</K><Sums><decimal>1.01</decimal><decimal>2.02</decimal></Sums><Muls><int>1</int><int>4</int></Muls></Input>"
     xml_obj = input()
