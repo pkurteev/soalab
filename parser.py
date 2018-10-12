@@ -1,13 +1,12 @@
 import json
+import xml.etree.cElementTree as ET
 from functools import reduce
 from decimal import *
-import xml.etree.cElementTree as ET
 
-type = input()
-# abc = '{"K":10,"Sums":[1.01,2.02],"Muls":[1,4]}'
-if type == "Json":
-    json_input = input()
-    json_obj = json.loads(json_input)
+
+def parse_json(object):
+    # object = '{"K":10,"Sums":[1.01,2.02],"Muls":[1,4]}'
+    json_obj = json.loads(object)
     sums = list(map(lambda x: Decimal(str(x)), json_obj["Sums"]))
     muls = json_obj["Muls"]
     K = Decimal(str(json_obj["K"]))
@@ -22,12 +21,13 @@ if type == "Json":
     data['MulResult'] = float(mul_result)
     data['SortedInputs'] = sorted_vals
     json_data = json.dumps(data)
-    print(type)
+    print("Json")
     print(json_data)
-else:
-    #i = "<Input><K>10</K><Sums><decimal>1.01</decimal><decimal>2.02</decimal></Sums><Muls><int>1</int><int>4</int></Muls></Input>"
-    xml_obj = input()
-    root = ET.fromstring(xml_obj)
+
+
+def parse_xml(object):
+    # object = "<Input><K>10</K><Sums><decimal>1.01</decimal><decimal>2.02</decimal></Sums><Muls><int>1</int><int>4</int></Muls></Input>"
+    root = ET.fromstring(object)
     sums = []
     muls = []
     values = []
@@ -54,5 +54,11 @@ else:
         el.text = str(val)
         SortedInputs.append(el)
     output_xml.append(SortedInputs)
-    print(type)
+    print("Xml")
     print(ET.tostring(output_xml, encoding='unicode'))
+
+
+if __name__ == '__main__':
+    object_type = input()
+    object = input()
+    parse_json(object) if object_type == "Json" else parse_xml(object)
