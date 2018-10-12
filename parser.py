@@ -4,12 +4,30 @@ from functools import reduce
 from decimal import *
 
 
+def form_xml_tree(root, sum_result, mul_result, sorted_inputs):
+    SumResult = ET.Element('SumResult')
+    SumResult.text = str(sum_result)
+    root.append(SumResult)
+
+    MulResult = ET.Element('MulResult')
+    MulResult.text = str(mul_result)
+    root.append(MulResult)
+
+    SortedInputs = ET.Element('SortedInputs')
+    for val in sorted_inputs:
+        el = ET.Element('decimal')
+        el.text = str(val)
+        SortedInputs.append(el)
+
+    root.append(SortedInputs)
+
+
 def parse_json(object):
     # object = '{"K":10,"Sums":[1.01,2.02],"Muls":[1,4]}'
     json_obj = json.loads(object)
     sums = list(map(lambda x: Decimal(str(x)), json_obj["Sums"]))
     muls = json_obj["Muls"]
-    K = Decimal(str(json_obj["K"]))
+    K = Decimal(json_obj["K"])
     values = []
     values.extend(muls)
     values.extend(sums)
@@ -17,7 +35,7 @@ def parse_json(object):
     mul_result = reduce(lambda x, y: x * y, muls)
     sorted_vals = sorted(list(map(lambda x: float(x), values)))
     data = {}
-    data['SumResult'] = float(sum_result)
+    data['SumResult'] = str(sum_result)
     data['MulResult'] = float(mul_result)
     data['SortedInputs'] = sorted_vals
     json_data = json.dumps(data)
@@ -42,18 +60,7 @@ def parse_xml(object):
     mul_result = reduce(lambda x, y: x * y, muls)
     sorted_vals = sorted(list(map(lambda x: float(x), values)))
     output_xml = ET.Element('Output')
-    SumResult = ET.Element('SumResult')
-    SumResult.text = str(sum_result)
-    output_xml.append(SumResult)
-    MulResult = ET.Element('MulResult')
-    MulResult.text = str(mul_result)
-    output_xml.append(MulResult)
-    SortedInputs = ET.Element('SortedInputs')
-    for val in sorted_vals:
-        el = ET.Element('decimal')
-        el.text = str(val)
-        SortedInputs.append(el)
-    output_xml.append(SortedInputs)
+    form_xml_tree(output_xml, sum_result, mul_result, sorted_vals)
     print("Xml")
     print(ET.tostring(output_xml, encoding='unicode'))
 
