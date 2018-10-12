@@ -4,6 +4,35 @@ from functools import reduce
 from decimal import *
 
 
+def parse_json(object):
+    # object = '{"K":10,"Sums":[1.01,2.02],"Muls":[1,4]}'
+    json_obj = json.loads(object)
+    sums = list(map(lambda x: Decimal(str(x)), json_obj["Sums"]))
+    muls = json_obj["Muls"]
+    K = Decimal(json_obj["K"])
+    values = []
+    values.extend(muls)
+    values.extend(sums)
+    return K, sums, muls, values
+
+
+def do_task(k, sum_result, mul_result, values):
+    sum_result = sum(sum_result) * k
+    mul_result = reduce(lambda x, y: x * y, mul_result)
+    sorted_vals = sorted(list(map(lambda x: float(x), values)))
+    return sum_result, mul_result, sorted_vals
+
+
+def form_json(sum_result, mul_result, sorted_vals):
+    json_data = {}
+    json_data['SumResult'] = str(sum_result)
+    json_data['MulResult'] = float(mul_result)
+    json_data['SortedInputs'] = sorted_vals
+    json_data = json.dumps(json_data)
+    print("Json")
+    print(json_data)
+
+
 def form_xml_tree(root, sum_result, mul_result, sorted_inputs):
     SumResult = ET.Element('SumResult')
     SumResult.text = str(sum_result)
@@ -22,27 +51,6 @@ def form_xml_tree(root, sum_result, mul_result, sorted_inputs):
     root.append(SortedInputs)
 
 
-def parse_json(object):
-    # object = '{"K":10,"Sums":[1.01,2.02],"Muls":[1,4]}'
-    json_obj = json.loads(object)
-    sums = list(map(lambda x: Decimal(str(x)), json_obj["Sums"]))
-    muls = json_obj["Muls"]
-    K = Decimal(json_obj["K"])
-    values = []
-    values.extend(muls)
-    values.extend(sums)
-    sum_result = sum(sums) * K
-    mul_result = reduce(lambda x, y: x * y, muls)
-    sorted_vals = sorted(list(map(lambda x: float(x), values)))
-    data = {}
-    data['SumResult'] = str(sum_result)
-    data['MulResult'] = float(mul_result)
-    data['SortedInputs'] = sorted_vals
-    json_data = json.dumps(data)
-    print("Json")
-    print(json_data)
-
-
 def parse_xml(object):
     # object = "<Input><K>10</K><Sums><decimal>1.01</decimal><decimal>2.02</decimal></Sums><Muls><int>1</int><int>4</int></Muls></Input>"
     root = ET.fromstring(object)
@@ -56,9 +64,10 @@ def parse_xml(object):
         muls.append(Decimal(int.text))
     values.extend(muls)
     values.extend(sums)
-    sum_result = sum(sums) * K
-    mul_result = reduce(lambda x, y: x * y, muls)
-    sorted_vals = sorted(list(map(lambda x: float(x), values)))
+    return K, sums, muls, values
+
+
+def form_xml(sum_result, mul_result, sorted_vals):
     output_xml = ET.Element('Output')
     form_xml_tree(output_xml, sum_result, mul_result, sorted_vals)
     print("Xml")
@@ -68,4 +77,11 @@ def parse_xml(object):
 if __name__ == '__main__':
     object_type = input()
     object = input()
-    parse_json(object) if object_type == "Json" else parse_xml(object)
+    if object_type == "Json":
+        data = parse_json(object)
+        data = do_task(*data)
+        form_json(*data)
+    else:
+        data = parse_xml(object)
+        data = do_task(*data)
+        form_xml(*data)
