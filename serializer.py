@@ -28,7 +28,12 @@ def form_json(sum_result, mul_result, sorted_vals):
     json_data['MulResult'] = mul_result
     json_data['SortedInputs'] = sorted_vals
     json_data = json.dumps(json_data).replace(" ", "")
-    return json_data
+    str1 = json_data[0:json_data.index(':')]
+    str2 = json_data[len(str1):json_data.index(',')]
+    str3 = json_data[len(str2) + len(str1):]
+    str2 = str2.replace('"', '')
+    str = str1 + str2 + str3
+    return str
 
 
 def form_xml_tree(root, sum_result, mul_result, sorted_inputs):
@@ -42,10 +47,11 @@ def form_xml_tree(root, sum_result, mul_result, sorted_inputs):
 
     SortedInputs = ET.Element('SortedInputs')
     for val in sorted_inputs:
+        if (float(val) == int(val)):
+            val = int(val)
         el = ET.Element('decimal')
         el.text = str(val)
         SortedInputs.append(el)
-
     root.append(SortedInputs)
 
 
@@ -67,7 +73,7 @@ def parse_xml(object):
 def form_xml(sum_result, mul_result, sorted_vals):
     output_xml = ET.Element('Output')
     form_xml_tree(output_xml, sum_result, mul_result, sorted_vals)
-    return ET.tostring(output_xml, encoding='unicode')
+    return ET.tostring(output_xml, encoding='unicode').replace('"', "")
 
 
 if __name__ == '__main__':
@@ -76,10 +82,8 @@ if __name__ == '__main__':
     if object_type == "Json":
         data = parse_json(object)
         data = do_task(*data)
-        print(object_type)
         print(form_json(*data))
     else:
         data = parse_xml(object)
         data = do_task(*data)
-        print(object_type)
         print(form_xml(*data))
