@@ -6,16 +6,16 @@ import xml.etree.cElementTree as ET
 
 class Output:
     def __init__(self, data):
-        self.SumResult = "{:.2f}".format(sum(data.Sums) * data.K)
-        self.MulResult = reduce(lambda x, y: x * y, data.Muls)
-        sorted_inputs = data.Sums
-        sorted_inputs.extend(data.Muls)
+        self.SumResult = "{:.2f}".format(sum(data['Sums']) * data['K'])
+        self.MulResult = reduce(lambda x, y: x * y, data['Muls'])
+        sorted_inputs = data['Sums']
+        sorted_inputs.extend(data['Muls'])
         sorted_inputs.sort()
         self.SortedInputs = sorted_inputs
 
 
 def parse_json(json_object):
-    data = json.loads(json_object, object_hook=lambda x: namedtuple('input', x.keys())(*x.values()))
+    data = json.loads(json_object)
     output = json.dumps(Output(data).__dict__)
     return output
 

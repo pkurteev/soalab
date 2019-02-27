@@ -1,4 +1,3 @@
-from serializer import parse_json
 import requests
 
 
@@ -12,6 +11,7 @@ if __name__ == '__main__':
     port = input()
     address = 'http://127.0.0.1:{}/'.format(port)
     ping(address)
-    data = requests.get(address + "/GetInputData").json()
-    answer = parse_json(data)
-    r = requests.post(address + '/WriteAnswer', json=answer)
+    r = requests.post(address + "/PostInputData", json={"K": 10, "Sums": [1.01, 2.02], "Muls": [1, 4]})
+    r = requests.get(address + "/GetAnswer")
+    print(r.content.decode('utf-8'))
+    r = requests.get(address + "/Stop")
