@@ -17,7 +17,7 @@ class Output:
 def parse_json(json_object):
     data = json.loads(json_object, object_hook=lambda x: namedtuple('input', x.keys())(*x.values()))
     output = json.dumps(Output(data).__dict__)
-    print(output)
+    return output
 
 
 def parse_xml(xml_object):
@@ -37,7 +37,7 @@ def parse_xml(xml_object):
     sums = sum(sums) * int(K)
     output_root = ET.Element('Output')
     form_xml_tree(output_root, sums, muls, values)
-    print(ET.tostring(output_root, encoding='unicode').replace('"', ""))
+    return ET.tostring(output_root, encoding='unicode').replace('"', "")
 
 
 def form_xml_tree(root, sum_result, mul_result, sorted_inputs):
@@ -55,12 +55,3 @@ def form_xml_tree(root, sum_result, mul_result, sorted_inputs):
         el.text = str(val)
         SortedInputs.append(el)
     root.append(SortedInputs)
-
-
-if __name__ == '__main__':
-    object_type = input()
-    object = input()
-    if object_type == "Json":
-        parse_json(object)
-    else:
-        parse_xml(object)
